@@ -1,9 +1,13 @@
 from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
-from rest_framework.views import APIView
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
+from rest_framework import serializers
+from rest_framework import status
+from rest_framework import viewsets
+from django.shortcuts import get_object_or_404
 from procedure_app.models import Procedure,Section,Field
 from procedure_app.api.serializers import ProcedureSerializer,SectionSerializer,FieldSerializer
 from procedure_app.api.paginations import ProcedurePagination
@@ -19,7 +23,9 @@ class ProcedureView(generics.CreateAPIView,generics.ListAPIView,generics.Destroy
         if(pk!=None):
             query_set=Procedure.objects.filter(pk=pk)
             if not(query_set.exists()):
-                raise ValidationError("Procedure not exists")
+                res = serializers.ValidationError({'staus':'False','message':'Give valid procedure id'})
+                res.status_code = 200
+                raise res
             else:
                 return query_set
         else:
@@ -51,7 +57,9 @@ class SectionView(generics.CreateAPIView,generics.ListAPIView,generics.DestroyAP
         elif(procedure!=None):
             query_set=Section.objects.filter(procedure=procedure)
             if not(query_set.exists()):
-                raise ValidationError("Give a valid procedure id")
+                res = serializers.ValidationError({'staus':'False','message':'Give valid procedure id'})
+                res.status_code = 200
+                raise res
             else:
                 return query_set
         else:
@@ -68,11 +76,81 @@ class FieldView(generics.CreateAPIView,generics.ListAPIView,generics.DestroyAPIV
         pk=self.kwargs.get('pk')
         id=Field.objects.get(pk=pk)
         id.delete()
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response({
+            "status":"success"
+        },
+        status=status.HTTP_200_OK)
     def get_queryset(self):
         section=self.request.query_params.get('section')
         query_set=Field.objects.filter(section=section)
         if not(query_set.exists()):
-            raise ValidationError("Give a valid section ID")
+             res = serializers.ValidationError({'staus':'False','message':'Give valid section id'})
+             res.status_code = 200
+             raise res
+            
         else:
             return query_set
 
+class FieldViewSet(viewsets.ViewSet):
+    serializer_class = FieldSerializer
+    queryset=Field.objects.all()
+    def list(self, request, procedure_pk=None, section_pk=None):
+        queryset = Field.objects.filter(section__procedure=procedure_pk,section=section_pk)
+        serializer = FieldSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None, procedure_pk=None, section_pk=None):
+        queryset = Field.objects.filter(pk=pk, section=section_pk, section__procedure=procedure_pk)
+        field = get_object_or_404(queryset, pk=pk)
+        serializer = FieldSerializer(field)
+        return Response(serializer.data)
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.queryset.get(pk=kwargs.get('pk'))
+        serializer = self.serializer_class(instance, data=request.data, partial=True)
+        if(not serializer.is_valid()):
+            return Response({"status":"fail","message":serializer.errors})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"status":"success"})
+    
+class SectionViewSet(viewsets.ViewSet):
+    serializer_class = SectionSerializer
+    queryset = Section.objects.all()
+    def list(self, request, procedure_pk=None):
+        queryset = Section.objects.filter(procedure=procedure_pk)
+        serializer = SectionSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None, procedure_pk=None):
+        queryset = Section.objects.filter(pk=pk,procedure=procedure_pk)
+        section = get_object_or_404(queryset, pk=pk)
+        serializer = SectionSerializer(section)
+        return Response(serializer.data)
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.queryset.get(pk=kwargs.get('pk'))
+        serializer = self.serializer_class(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"status":"success"})
+class ProcedureViewSet(viewsets.ViewSet):
+    serializer_class = ProcedureSerializer
+    queryset=Procedure.objects.all()
+    def list(self, request,):
+        queryset = Procedure.objects.all()
+        serializer = ProcedureSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None):
+        queryset = Procedure.objects.filter(pk=pk)
+        procedure = get_object_or_404(queryset, pk=pk)
+        serializer = ProcedureSerializer(procedure)
+        return Response(serializer.data)
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.queryset.get(pk=kwargs.get('pk'))
+        serializer = self.serializer_class(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"status":"success"})
