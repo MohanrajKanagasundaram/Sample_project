@@ -7,10 +7,31 @@ from rest_framework.exceptions import ValidationError
 from rest_framework import serializers
 from rest_framework import status
 from rest_framework import viewsets
+from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from procedure_app.models import Procedure,Section,Field
 from procedure_app.api.serializers import ProcedureSerializer,SectionSerializer,FieldSerializer
 from procedure_app.api.paginations import ProcedurePagination
+
+from django.template import RequestContext
+
+
+# def handler404(request, *args, **argv):
+#     response = render_to_response('404.html', {},
+#                                   context_instance=RequestContext(request))
+#     response.status_code = 404
+#     return response
+
+
+# def handler500(request, *args, **argv):
+#     response = render_to_response('500.html', {},
+#                                   context_instance=RequestContext(request))
+#     response.status_code = 500
+#     return response
+def error_404_view(request, exception):
+    data = {"name": "ThePythonDjango.com"}
+    return render(request,'404.json', data)
+
 class ProcedureView(generics.CreateAPIView,generics.ListAPIView,generics.DestroyAPIView,generics.UpdateAPIView):
     serializer_class=ProcedureSerializer
     pagination_class=ProcedurePagination

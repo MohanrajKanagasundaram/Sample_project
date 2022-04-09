@@ -23,9 +23,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-&16g%@udj!+a)m6==!aq-cqciw%fy-2-gtx-&^i&ecn3sj+e5q'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+TEMPLATE_DEBUG = DEBUG
+
+
+
+TEMPLATE_DIRS = (
+    'C:/Users/mohanarajk/Desktop/drf-project1/workhall_procedure/procedure_app/templates',
+)
+
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -113,7 +121,7 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
+DEBUG = False
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/

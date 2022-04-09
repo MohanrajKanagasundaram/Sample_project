@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 from rest_framework_nested import routers
 from django.conf.urls import handler404
 from procedure_app.api.views import ProcedureView,SectionView,FieldView
-from procedure_app.api.views import FieldViewSet,SectionViewSet,ProcedureViewSet,ErrorView
+from procedure_app.api.views import FieldViewSet,SectionViewSet,ProcedureViewSet
 router = DefaultRouter()
 router.register(r'procedures', ProcedureViewSet, basename='procedures')
 
@@ -25,4 +25,5 @@ urlpatterns = [
    # path('section/field/<int:pk>/',FieldView.as_view(),name='field'),
    # path(r'<str:pk>',ErrorView,name="page not found error")
 ]
+
 
