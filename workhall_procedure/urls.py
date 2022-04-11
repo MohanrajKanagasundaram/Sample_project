@@ -20,5 +20,6 @@ from django.conf.urls import handler404
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('procedure/',include('procedure_app.api.urls')),
+    path('predictions/',include('evaluation_app.api.urls')),
 ]
 handler404 = 'procedure_app.api.views.error_404_view'

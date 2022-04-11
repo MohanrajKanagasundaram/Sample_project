@@ -29,9 +29,9 @@ from django.template import RequestContext
 #     response.status_code = 500
 #     return response
 def error_404_view(request, exception):
-    data = {"name": "ThePythonDjango.com"}
-    return render(request,'404.json', data)
-
+    # data = {"name": "ThePythonDjango.com"}
+    return render(request,'404.json')
+    return Response({"status":"fail"})
 class ProcedureView(generics.CreateAPIView,generics.ListAPIView,generics.DestroyAPIView,generics.UpdateAPIView):
     serializer_class=ProcedureSerializer
     pagination_class=ProcedurePagination

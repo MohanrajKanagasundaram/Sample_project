@@ -14,6 +14,7 @@ class FieldSerializer(serializers.ModelSerializer):
             return value
 class SectionSerializer(serializers.ModelSerializer):
     field=FieldSerializer(many=True)
+    id = serializers.IntegerField(read_only=False)
     class Meta:
         model=Section
         exclude=['procedure']

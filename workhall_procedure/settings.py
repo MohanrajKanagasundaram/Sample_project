@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-&16g%@udj!+a)m6==!aq-cqciw%fy-2-gtx-&^i&ecn3sj+e5q'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+# DEBUG = False
 
-TEMPLATE_DEBUG = DEBUG
+# TEMPLATE_DEBUG = DEBUG
 
 
 
@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'procedure_app',
     'rest_framework',
     'django_filters',
+    'evaluation_app',
 ]
 
 MIDDLEWARE = [
